@@ -1,9 +1,9 @@
 $ calc
-> 12 + 30
-> 42
-> 10 * 20
-> 200
-> q
+    > 12 + 30
+    > 42
+    > 10 * 20
+    > 200
+    > q
 $
 
 
@@ -34,7 +34,7 @@ let input = null;
 
 while ((input = readline()) != 'q') {
     engine.clear();
-    foreach (char in input) {
+    foreach(char in input) {
         engine.input(char);
     }
 
@@ -52,7 +52,7 @@ let outputBox = document.querySelector('.output-box');
 let engine = new CalculatorEngine();
 
 clear.addEventListener('click', () => engine.clear());
-foreach (btn in buttons) {
+foreach(btn in buttons) {
     btn.addEventListener('click', () {
         let input = btn.dataset.get('input-char');
         engine.input(input);

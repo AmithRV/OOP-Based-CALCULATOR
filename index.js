@@ -1,110 +1,191 @@
-const calculator = document.querySelector('.calculator');
-const keys = calculator.querySelector('.calculator__keys');
-const screen = calculator.querySelector('.calculator__output');
-const result = calculator.querySelector('.calculator__key--enter');
-
-class mathError {
+class CalculatorEngine {
     constructor() {
-        screen.innerHTML = 'Math error';
-        setTimeout(() => screen.innerHTML = ' ', 600);
-    }
-}
+        let result = 0;
+        let reset = false;
+        let previous = '';
+        this.opValues = ["+", "-", "*", "/"];
 
-class syntaxError {
-    constructor() {
-        screen.innerHTML = 'Syntax Error';
-        setTimeout(() => screen.innerHTML = ' ', 600);
-    }
-}
+        this.isNumeric = function (num) {
+            let flag = !isNaN(num) && isFinite(num);
+            return flag;
+        };
 
-class evaluate {
-    constructor() {
-        console.log('screen : ', screen.innerHTML);
+        this.setResult = function (val) {
+            reset = val;
+        };
 
-        screen.innerHTML = eval(screen.innerHTML);
-        if (String(screen.innerHTML) == 'NaN') {
-            new mathError();
-        }
-    }
-}
+        this.getResult = function () {
+            return reset;
+        };
 
-class Empty {
-    constructor() {
-        this.flag = false,
-            this.isEmpty = function (value) {
-                if (value.length === 0) {
-                    this.flag = true;
-                } else {
-                    this.flag = false;
+        this.convertExpression = function (s) {
+            if (s.length === 0) return 0;
+
+            var a = [];
+            a = s.split(" ");
+            for (var i = 0; i < a.length; i++) {
+                if (this.isNumeric(a[i])) {
+                    a[i] = Number(a[i]);
                 }
-                return this.flag;
             }
-    }
-}
 
-class operations {
-    constructor(event) {
-        if (event.target.matches('button')) {
-            if (event.target.innerHTML === '=') {
-                try {
-                    let isEmpty = new Empty();
-                    let flag = isEmpty.isEmpty(screen.innerHTML);
-                    if (!flag && typeof (eval(screen.innerHTML)) != 'undefined') {
-                        new evaluate();
+            return a;
+        }
+
+        this.multiplyOrDivide = function (a) {
+            var total = 0;
+            if (a.indexOf('*') !== -1 || a.indexOf('/') !== -1) {
+                for (var i = 0; i < a.length; i++) {
+                    try {
+                        switch (a[i]) {
+                            case '*':
+                                total = a[i - 1] * a[i + 1];
+                                a.splice(i - 1, 3, total);
+                                i--;
+                                break;
+                            case '/':
+                                if (a[i + 1] === 0) {
+                                    throw new Error("dividing by zero");
+                                } else {
+                                    total = a[i - 1] / a[i + 1];
+                                }
+                                a.splice(i - 1, 3, total);
+                                i--;
+                                break;
+                            default:
+                                break;
+                        }
+                    } catch (e) {
+                        console.log(e.message);
+                        if (e.message == 'dividing by zero') {
+
+                        }
                     }
                 }
-                catch (error) {
-                    new syntaxError();
+            }
+            return a;
+        }
+
+        this.addOrSubtract = function (a) {
+            var total = 0;
+            if (a.indexOf('+') !== -1 || a.indexOf('-') !== -1) {
+                for (var i = 0; i < a.length; i++) {
+                    try {
+                        switch (a[i]) {
+                            case '+':
+                                total = a[i - 1] + a[i + 1];
+                                a.splice(i - 1, 3, total);
+                                i--;
+                                break;
+                            case '-':
+                                total = a[i - 1] - a[i + 1];
+                                a.splice(i - 1, 3, total);
+                                i--;
+                                break;
+                            default:
+                                break;
+                        }
+                    } catch (e) {
+                        console.log(e.name + ': ' + e.message);
+                    }
                 }
             }
-            else if (event.target.id === 'c') {
-                screen.innerHTML = '';
-            }
-            else {
-                screen.innerHTML += event.target.id;
-            }
+            return a;
         }
+
+        this.equals = function (s) {
+            if (s.length === 0) return "";
+
+            let a = this.convertExpression(s);
+            this.previous = result;
+            if (a.length === 0)
+                result = 0;
+
+            //order of operations
+            a = this.multiplyOrDivide(a);
+            a = this.addOrSubtract(a);
+
+            try {
+                if (a.length !== 1 || !Number(a[0])) {
+                    throw new Error("Order of operations incomplete");
+                }
+                result = a[0];
+            } catch (e) {
+                console.log(e.name + ': ' + e.message);
+                result = "error";
+            }
+
+            return result;
+        }
+
+        this.clearAll = function () {
+            result = "";
+            previous = "";
+            return result;
+        }
+
+        //go back to last answer
+        this.clearLast = function () {
+            result = previous;
+            previous = " ";
+            return result;
+        }
+
     }
 }
 
-keys.addEventListener('click', (event) => {
-    new operations(event);
-})
+let inti = function () {
+    let inputOutput = document.getElementById("calculator__output");
+    let calculate = function (e) {
+        let element = e.target;
+        let op = element.id;
+        let engine = new CalculatorEngine();
 
-document.addEventListener('keydown', (event) => {
-    class colorChange {
-        constructor(key) {
-            let color = document.getElementById(key).style.backgroundColor;
-            setTimeout(() => document.getElementById(key).style.backgroundColor = color, 100);
-            document.getElementById(key).style.backgroundColor = 'rgb(250, 192, 150)';
-        }
-    }
-
-    if (event.key === '=' || event.key === 'Enter') {
-        new colorChange('=')
         try {
-            if (typeof (eval(screen.innerHTML)) != 'undefined') {
-                new evaluate();
+            if (engine.isNumeric(op)) {
+                if (engine.getResult()) {
+                    inputOutput.value = op;
+                } else {
+                    inputOutput.value += op;
+                }
+                engine.setResult(false);
+            } else if (op === ".") {
+                if (engine.isNumeric(inputOutput.value.substr(-1))) {   // substitue . at the end               
+                    inputOutput.value += op;
+                    engine.setResult(false);
+                }
+            } else if (engine.opValues.indexOf(op) !== -1) { //to check if the operator is valid i.e available in the opVals array
+                if (engine.opValues.indexOf(inputOutput.value.substr(-2, 1)) === -1) {
+                    inputOutput.value += " " + op + " ";
+                    engine.setResult(false);
+                }
             }
+            else if (op === "c") {
+                inputOutput.value = engine.clearLast();
+                engine.setResult(true);
+            } else if (op === "=" && !engine.getResult()) {
+                inputOutput.value = engine.equals(inputOutput.value);
+                engine.setResult(true);
+            }
+        } catch (error) {
+            console.log('error 1 : ', error);
         }
-        catch (error) {
-            new syntaxError();
+    };
+
+    (function () {
+        let calc = document.getElementById('calculator');
+        let buttons = calc.getElementsByTagName('button');
+
+        try {
+            let i = 0;
+        } catch (error) {
+            console.log('error : ', error);
         }
-    }
-    else if (event.key === 'c') {
-        new colorChange(event.key);
-        screen.innerHTML = ' ';
-    }
-    else if (event.key === 'Backspace') {
-        let text = screen.innerHTML;
-        text = text.replace(text[text.length - 1], '');
-        screen.innerHTML = text;
-    }
-    else {
-        const arr = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '0', '+', '-', '*', '/', '.'];
-        if (arr.includes(event.key, 0) === true) {      //Start the search at position 0
-            new colorChange(event.key);
-            screen.innerHTML += event.key;
+
+        for (let i = 0; i < buttons.length; i++) {
+            buttons[i].addEventListener('click', calculate);
         }
-    }
-})
+    })();
+
+}
+window.onload = inti;
