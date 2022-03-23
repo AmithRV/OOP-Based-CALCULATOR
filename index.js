@@ -1,83 +1,85 @@
+var setDecimal = false; // to avoide multiple decimal points
+
 class CalculatorEngine {
     constructor() {
         let result = 0;
         let reset = false;
-        this.opValues = ["+", "-", "*", "/"];
+        this.operatorValues = ["+", "-", "*", "/"];
 
-        this.isNumeric = function (num) {
-            let flag = !isNaN(num) && isFinite(num);
+        this.isNumeric = function (number) {
+            let flag = !isNaN(number) && isFinite(number);
             return flag;
         };
 
-        this.convertExpression = function (s) {
-            if (s.length === 0) return 0;
+        this.convertExpression = function (stringExpression) {
+            if (stringExpression.length === 0) return 0;
 
-            var a = [];
-            a = s.split(" ");
-            for (var i = 0; i < a.length; i++) {
-                if (this.isNumeric(a[i])) {
-                    a[i] = Number(a[i]);
+            var equationArray = [];
+            equationArray = stringExpression.split(" ");
+            for (var i = 0; i < equationArray.length; i++) {
+                if (this.isNumeric(equationArray[i])) {
+                    equationArray[i] = Number(equationArray[i]);
                 }
             }
-            return a;
+            return equationArray;
         }
 
-        this.multiplyOrDivide = function (a) {
+        this.multiplyOrDivide = function (equation) {
             var total = 0;
-            if (a.indexOf('*') !== -1 || a.indexOf('/') !== -1) {
-                for (var i = 0; i < a.length; i++) {
+            if (equation.indexOf('*') !== -1 || equation.indexOf('/') !== -1) {
+                for (var i = 0; i < equation.length; i++) {
                     try {
-                        switch (a[i]) {
+                        switch (equation[i]) {
                             case '*':
-                                total = a[i - 1] * a[i + 1];
-                                a.splice(i - 1, 3, total);
+                                total = equation[i - 1] * equation[i + 1];
+                                equation.splice(i - 1, 3, total);
                                 i--;
                                 break;
                             case '/':
-                                if (a[i + 1] === 0) {
+                                if (equation[i + 1] === 0) {
                                     throw new Error("dividing by zero");
                                 } else {
-                                    total = a[i - 1] / a[i + 1];
+                                    total = equation[i - 1] / equation[i + 1];
+                                    equation.splice(i - 1, 3, total);
+                                    i--;
                                 }
-                                a.splice(i - 1, 3, total);
-                                i--;
                                 break;
                             default:
                                 break;
                         }
-                    } catch (e) {
-                        console.log(e.message);
+                    } catch (error) {
+                        console.log(error.message);
                     }
                 }
             }
-            return a;
+            return equation;
         }
 
-        this.addOrSubtract = function (a) {
+        this.addOrSubtract = function (equation) {
             var total = 0;
-            if (a.indexOf('+') !== -1 || a.indexOf('-') !== -1) {
-                for (var i = 0; i < a.length; i++) {
+            if (equation.indexOf('+') !== -1 || equation.indexOf('-') !== -1) {
+                for (var i = 0; i < equation.length; i++) {
                     try {
-                        switch (a[i]) {
+                        switch (equation[i]) {
                             case '+':
-                                total = a[i - 1] + a[i + 1];
-                                a.splice(i - 1, 3, total);
+                                total = equation[i - 1] + equation[i + 1];
+                                equation.splice(i - 1, 3, total);
                                 i--;
                                 break;
                             case '-':
-                                total = a[i - 1] - a[i + 1];
-                                a.splice(i - 1, 3, total);
+                                total = equation[i - 1] - equation[i + 1];
+                                equation.splice(i - 1, 3, total);
                                 i--;
                                 break;
                             default:
                                 break;
                         }
-                    } catch (e) {
-                        console.log(e.name + ': ' + e.message);
+                    } catch (error) {
+                        console.log(error.name + ': ' + error.message);
                     }
                 }
             }
-            return a;
+            return equation;
         }
 
         this.equals = function (equation) {
@@ -94,12 +96,18 @@ class CalculatorEngine {
             try {
                 if (equationArray.length !== 1) {
                     throw new Error("Order of operations incomplete");
+                } else {
+                    result = equationArray[0];
                 }
-                result = equationArray[0];
+
             } catch (error) {
                 console.log(error.name + ': ' + error.message);
                 result = "error";
             }
+            if (String(result) == 'NaN') {
+                result = "error";
+            }
+
             return result;
         }
     }
@@ -107,25 +115,29 @@ class CalculatorEngine {
 
 let inti = function () {
     let inputOutput = document.getElementById("calculator__output");
-    let calculate = function (e) {
-        let element = e.target;
+    let calculate = function (event) {
+        let element = event.target;
         let op = element.id;
         let engine = new CalculatorEngine();
-        let operators = engine.opValues;
+        let operators = engine.operatorValues;
 
         try {
             if (engine.isNumeric(op)) {
                 inputOutput.value += op;
             } else if (op === ".") {
-                if (engine.isNumeric(inputOutput.value.substr(-1))) { // if the last digit is not numeric the , is not added
+                if (engine.isNumeric(inputOutput.value.substr(-1)) && setDecimal === false) {
+                    setDecimal = true;
+                    console.log(` engine.setDecimal : ${setDecimal} `);
                     inputOutput.value += op;
                 }
             } else if (operators.indexOf(op) !== -1) { //to check if the operator is valid i.e available in the opVals array
+                setDecimal = false;
                 if (operators.indexOf(inputOutput.value.substr(-2, 1)) === -1) {
                     inputOutput.value += " " + op + " ";
                 }
             }
             else if (op === "c") {
+                setDecimal = false;
                 inputOutput.value = '';
             } else if (op === "=") {
                 inputOutput.value = engine.equals(inputOutput.value);
@@ -136,19 +148,12 @@ let inti = function () {
     };
 
     (function () {
-        let calc = document.getElementById('calculator');
-        let buttons = calc.getElementsByTagName('button');
-
-        try {
-            let i = 0;
-        } catch (error) {
-            console.log('error : ', error);
-        }
+        let calculator = document.getElementById('calculator');
+        let buttons = calculator.getElementsByTagName('button');
 
         for (let i = 0; i < buttons.length; i++) {
             buttons[i].addEventListener('click', calculate);
         }
     })();
-
 }
 window.onload = inti;
