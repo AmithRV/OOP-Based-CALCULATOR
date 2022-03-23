@@ -31,7 +31,7 @@ class CalculatorEngine {
                     try {
                         switch (equation[i]) {
                             case '*':
-                                if (equation[i + 1] == '' || equation[i + 1] == '.') {      // to check if the second operator is empty or '.'
+                                if (equation[i + 1] == '.') {      // to check if the second operator is '.'
                                     throw new Error("syntax error");
                                 } else {
                                     total = equation[i - 1] * equation[i + 1];
@@ -45,7 +45,7 @@ class CalculatorEngine {
                                     console.log(equation);
                                     throw new Error("dividing by zero");
 
-                                } else if (equation[i + 1] == '' || equation[i + 1] == '.') {       // to check if the second operator is absent or '.' 
+                                } else if (equation[i + 1] == '.') {       // to check if the second operator is absent or '.' 
                                     throw new Error("syntax error");
                                 } else {
                                     total = equation[i - 1] / equation[i + 1];
