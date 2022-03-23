@@ -80,24 +80,24 @@ class CalculatorEngine {
             return a;
         }
 
-        this.equals = function (s) {
-            if (s.length === 0) return "";
+        this.equals = function (equation) {
+            if (equation.length === 0) return "";
 
-            let a = this.convertExpression(s);
-            if (a.length === 0)
+            let equationArray = this.convertExpression(equation);
+            if (equationArray.length === 0)
                 result = 0;
 
             //order of operations
-            a = this.multiplyOrDivide(a);
-            a = this.addOrSubtract(a);
+            equationArray = this.multiplyOrDivide(equationArray);
+            equationArray = this.addOrSubtract(equationArray);
 
             try {
-                if (a.length !== 1) {
+                if (equationArray.length !== 1) {
                     throw new Error("Order of operations incomplete");
                 }
-                result = a[0];
-            } catch (e) {
-                console.log(e.name + ': ' + e.message);
+                result = equationArray[0];
+            } catch (error) {
+                console.log(error.name + ': ' + error.message);
                 result = "error";
             }
             return result;
@@ -111,6 +111,7 @@ let inti = function () {
         let element = e.target;
         let op = element.id;
         let engine = new CalculatorEngine();
+        let operators = engine.opValues;
 
         try {
             if (engine.isNumeric(op)) {
@@ -119,8 +120,8 @@ let inti = function () {
                 if (engine.isNumeric(inputOutput.value.substr(-1))) { // if the last digit is not numeric the , is not added
                     inputOutput.value += op;
                 }
-            } else if (engine.opValues.indexOf(op) !== -1) { //to check if the operator is valid i.e available in the opVals array
-                if (engine.opValues.indexOf(inputOutput.value.substr(-2, 1)) === -1) {
+            } else if (operators.indexOf(op) !== -1) { //to check if the operator is valid i.e available in the opVals array
+                if (operators.indexOf(inputOutput.value.substr(-2, 1)) === -1) {
                     inputOutput.value += " " + op + " ";
                 }
             }
