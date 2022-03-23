@@ -31,7 +31,7 @@ class CalculatorEngine {
                     try {
                         switch (equation[i]) {
                             case '*':
-                                if (equation[i + 1] == '') {
+                                if (equation[i + 1] == '' || equation[i + 1] == '.') {      // to check if the second operator is empty or '.'
                                     throw new Error("syntax error");
                                 } else {
                                     total = equation[i - 1] * equation[i + 1];
@@ -41,8 +41,12 @@ class CalculatorEngine {
                                 }
 
                             case '/':
-                                if (equation[i + 1] === 0) {
+                                if (equation[i + 1] === 0) {      // to check if the second operator is 0 
+                                    console.log(equation);
                                     throw new Error("dividing by zero");
+
+                                } else if (equation[i + 1] == '' || equation[i + 1] == '.') {       // to check if the second operator is absent or '.' 
+                                    throw new Error("syntax error");
                                 } else {
                                     total = equation[i - 1] / equation[i + 1];
                                     equation.splice(i - 1, 3, total);
@@ -62,12 +66,13 @@ class CalculatorEngine {
 
         this.addOrSubtract = function (equation) {
             var total = 0;
-            if (equation.indexOf('+') !== -1 || equation.indexOf('-') !== -1) {
+            if ((equation.indexOf('+') !== -1 || equation.indexOf('-') !== -1)) {
+                console.log('equation[0] : ', equation)
                 for (var i = 0; i < equation.length; i++) {
                     try {
                         switch (equation[i]) {
                             case '+':
-                                if (equation[i + 1] == '') {
+                                if (equation[i + 1] == '' || equation[i + 1] == '.') {      // to check if the second operator is empty or '.'
                                     throw new Error("syntax error");
                                 } else {
                                     total = equation[i - 1] + equation[i + 1];
@@ -76,7 +81,7 @@ class CalculatorEngine {
                                 }
                                 break;
                             case '-':
-                                if (equation[i + 1] == '') {
+                                if (equation[i + 1] == '' || equation[i + 1] == '.') {      // to check if the second operator is empty or '.'
                                     throw new Error("syntax error");
                                 } else {
                                     total = equation[i - 1] - equation[i + 1];
@@ -115,7 +120,7 @@ class CalculatorEngine {
 
             } catch (error) {
                 console.log(error.name + ': ' + error.message);
-                result = "errorr";
+                result = "error";
             }
             if (String(result) == 'NaN') {
                 result = "error";
@@ -152,6 +157,7 @@ let inti = function () {
                 setDecimal = false;
                 inputOutput.value = '';
             } else if (op === "=") {
+                setDecimal = false;
                 inputOutput.value = engine.equals(inputOutput.value);
             }
         } catch (error) {
