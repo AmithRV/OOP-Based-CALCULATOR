@@ -127,7 +127,6 @@ let inti = function () {
             } else if (op === ".") {
                 if (engine.isNumeric(inputOutput.value.substr(-1)) && setDecimal === false) {
                     setDecimal = true;
-                    console.log(` engine.setDecimal : ${setDecimal} `);
                     inputOutput.value += op;
                 }
             } else if (operators.indexOf(op) !== -1) { //to check if the operator is valid i.e available in the opVals array
