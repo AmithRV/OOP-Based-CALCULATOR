@@ -169,3 +169,12 @@ let inti = function () {
     })();
 }
 window.onload = inti;
+
+/**
+ working in console
+ ---------------------
+ create an object of calculatorEngine(),
+ let  engine = new calculatorEngine();
+ engine.multiplyOrDivide([10*4]);
+ 
+*/
