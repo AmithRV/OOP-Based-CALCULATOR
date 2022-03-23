@@ -31,10 +31,15 @@ class CalculatorEngine {
                     try {
                         switch (equation[i]) {
                             case '*':
-                                total = equation[i - 1] * equation[i + 1];
-                                equation.splice(i - 1, 3, total);
-                                i--;
-                                break;
+                                if (equation[i + 1] == '') {
+                                    throw new Error("syntax error");
+                                } else {
+                                    total = equation[i - 1] * equation[i + 1];
+                                    equation.splice(i - 1, 3, total);
+                                    i--;
+                                    break;
+                                }
+
                             case '/':
                                 if (equation[i + 1] === 0) {
                                     throw new Error("dividing by zero");
@@ -62,14 +67,22 @@ class CalculatorEngine {
                     try {
                         switch (equation[i]) {
                             case '+':
-                                total = equation[i - 1] + equation[i + 1];
-                                equation.splice(i - 1, 3, total);
-                                i--;
+                                if (equation[i + 1] == '') {
+                                    throw new Error("syntax error");
+                                } else {
+                                    total = equation[i - 1] + equation[i + 1];
+                                    equation.splice(i - 1, 3, total);
+                                    i--;
+                                }
                                 break;
                             case '-':
-                                total = equation[i - 1] - equation[i + 1];
-                                equation.splice(i - 1, 3, total);
-                                i--;
+                                if (equation[i + 1] == '') {
+                                    throw new Error("syntax error");
+                                } else {
+                                    total = equation[i - 1] - equation[i + 1];
+                                    equation.splice(i - 1, 3, total);
+                                    i--;
+                                }
                                 break;
                             default:
                                 break;
@@ -102,7 +115,7 @@ class CalculatorEngine {
 
             } catch (error) {
                 console.log(error.name + ': ' + error.message);
-                result = "error";
+                result = "errorr";
             }
             if (String(result) == 'NaN') {
                 result = "error";
