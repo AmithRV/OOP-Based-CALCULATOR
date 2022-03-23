@@ -50,6 +50,10 @@
   overflow: auto;
 }
 
+.calculator__output:focus-visible {
+  outline: none;
+}
+
 .calculator__key--enter {
   background-color: rgb(255, 112, 119);
   grid-column: 4 / 5;

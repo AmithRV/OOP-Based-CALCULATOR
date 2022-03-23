@@ -2,20 +2,11 @@ class CalculatorEngine {
     constructor() {
         let result = 0;
         let reset = false;
-        let previous = '';
         this.opValues = ["+", "-", "*", "/"];
 
         this.isNumeric = function (num) {
             let flag = !isNaN(num) && isFinite(num);
             return flag;
-        };
-
-        this.setResult = function (val) {
-            reset = val;
-        };
-
-        this.getResult = function () {
-            return reset;
         };
 
         this.convertExpression = function (s) {
@@ -28,7 +19,6 @@ class CalculatorEngine {
                     a[i] = Number(a[i]);
                 }
             }
-
             return a;
         }
 
@@ -57,9 +47,6 @@ class CalculatorEngine {
                         }
                     } catch (e) {
                         console.log(e.message);
-                        if (e.message == 'dividing by zero') {
-
-                        }
                     }
                 }
             }
@@ -97,7 +84,6 @@ class CalculatorEngine {
             if (s.length === 0) return "";
 
             let a = this.convertExpression(s);
-            this.previous = result;
             if (a.length === 0)
                 result = 0;
 
@@ -106,7 +92,7 @@ class CalculatorEngine {
             a = this.addOrSubtract(a);
 
             try {
-                if (a.length !== 1 || !Number(a[0])) {
+                if (a.length !== 1) {
                     throw new Error("Order of operations incomplete");
                 }
                 result = a[0];
@@ -114,23 +100,8 @@ class CalculatorEngine {
                 console.log(e.name + ': ' + e.message);
                 result = "error";
             }
-
             return result;
         }
-
-        this.clearAll = function () {
-            result = "";
-            previous = "";
-            return result;
-        }
-
-        //go back to last answer
-        this.clearLast = function () {
-            result = previous;
-            previous = " ";
-            return result;
-        }
-
     }
 }
 
@@ -143,32 +114,23 @@ let inti = function () {
 
         try {
             if (engine.isNumeric(op)) {
-                if (engine.getResult()) {
-                    inputOutput.value = op;
-                } else {
-                    inputOutput.value += op;
-                }
-                engine.setResult(false);
+                inputOutput.value += op;
             } else if (op === ".") {
-                if (engine.isNumeric(inputOutput.value.substr(-1))) {   // substitue . at the end               
+                if (engine.isNumeric(inputOutput.value.substr(-1))) { // if the last digit is not numeric the , is not added
                     inputOutput.value += op;
-                    engine.setResult(false);
                 }
             } else if (engine.opValues.indexOf(op) !== -1) { //to check if the operator is valid i.e available in the opVals array
                 if (engine.opValues.indexOf(inputOutput.value.substr(-2, 1)) === -1) {
                     inputOutput.value += " " + op + " ";
-                    engine.setResult(false);
                 }
             }
             else if (op === "c") {
-                inputOutput.value = engine.clearLast();
-                engine.setResult(true);
-            } else if (op === "=" && !engine.getResult()) {
+                inputOutput.value = '';
+            } else if (op === "=") {
                 inputOutput.value = engine.equals(inputOutput.value);
-                engine.setResult(true);
             }
         } catch (error) {
-            console.log('error 1 : ', error);
+            console.log('error : ', error);
         }
     };
 
