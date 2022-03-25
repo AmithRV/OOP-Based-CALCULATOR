@@ -31,7 +31,7 @@ class CalculatorEngine {
                     try {
                         switch (equation[i]) {
                             case '*':
-                                if (equation[i + 1] == '.') {      // to check if the second operator is '.'
+                                if (equation[i + 1] == '.' || equation[i + 1] == '') {      // to check if the second operator is '.'
                                     throw new Error("syntax error");
                                 } else {
                                     total = equation[i - 1] * equation[i + 1];
